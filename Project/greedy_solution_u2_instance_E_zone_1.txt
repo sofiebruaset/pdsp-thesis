@@ -1,0 +1,25 @@
+Instance: E
+Zone: 1
+Target q: 3
+Selected turbines: 3
+Objective value: 28.530702317110993
+PDSP upper bound U1: 28.574250492227
+PDSP upper bound U2: 28.574250492227
+U2 iterations used: 200
+U2 best iteration: 1
+Cable upper bound: 3.1902251851359997e6
+Initial lower bound L1: 1.313622135056e6
+
+Gap U1 - z: 0.04354817511600828
+Gap U2 - z: 0.04354817511600828
+Improvement U1 - U2: 0.0
+
+Local indices within zone:
+3
+318
+575
+
+Global indices in full instance:
+3
+318
+575

@@ -1,0 +1,53 @@
+# Synthetic set of instances -- downscaled for quantum computers
+
+This folder includes downscaled instances of the wind farm layout problem, based on the synthetic instances introduced by Cazzaro and Pisinger [1]. Specifically, the provided data are downscaled versions of Instance B from [1]. Note, all instances are considered to be offshore wind farm instances.
+
+Each instance is associated with its respective folder. A summary of the instances are found in the table below. 
+
+
+| Instance Name | Available Positions  |Max. obj.      | Obj. of 20th best sol | Sol. num. where obj. changes drastically |
+|---------------|----------------------|---------------|-----------------------|------------------------------------------|
+| QWFLOP_10     | 10                   | 141.394       | 106.239               | 10                                       |
+| QWFLOP_20     | 20                   | 275.310       | 242.356               | 9                                        |
+| QWFLOP_30     | 30                   | 347.889       | 315.481               | 8                                        |
+| QWFLOP_40     | 40                   | 447.625       | 416.604               | 4                                        |
+| QWFLOP_50     | 50                   | 543.067       | 514.368               | 13                                       |
+| QWFLOP_54     | 54                   | 580.676       | 575.605               | >20                                      |
+
+
+## Data
+
+### Available positions
+Given an instance, all possible turbine positions are found in the file titled ```available_positions.csv```
+
+
+Each row is formatted as follows:
+```x_coordinate, y_coordinate, sea_depth, construction_cost```
+
+
+### Cost matrix
+Given an instance, the cost matrix is found in the file titled ```cost_matrix.csv```
+
+The diagonal elements of the cost matrix is the expected profit due to energy production in free wind (measured in Million Euro), minus the construction cost (measured in Million Euro). An off-diaginal element i,j is defined as the reduction in profit due to energy production (measured in Million Euro) at position j due to a turbine at position i. 
+
+
+### Constraint matrix
+Given an instance, we have found the turbine pairs that violate the distance constraint of the WFLOP. This is found in the file titled ```constraint_matrix.csv```
+
+
+In the wind farm layout problem there is a constraint that says that two turbines must be at least a distance D apart. In our case, ```D=1200``` In the constraint matrix, an element i,j equals 1 if turbine i and j are closer than D, and 0 otherwise. In order to add the distance constraint to the cost matrix, we can simply substract a multiple of the constraint matrix from the cost matrix. This way, we penalize any unfeasible solution. 
+
+### Solutions
+For each instance, we provide an illustration of the 20 best solutions (solution_1 is the best, etc.). All possible positions are plotted, where the nodes are colored green if a turbine was placed there, and red otherwise. 
+
+All instances have a number of solutions with very similar objetive values, until we see a big drop. This is essentially due to the fact that we have exhausted all the solutions with the maximum number of turbines and we must go to the next set of solutions, i.e. those with one less turbine. In the table above we report the optimal objective value, as well as the objective value of the 20th best solution. Finally, we report the solution number where we see the large drop in the objective value. In the final instance, QWFLOP_54, the drop is not reached within the first 20 solutions. 
+
+### Objective landscape
+For each instance we present the solution landscape. That is, for each solution (point on the x-axis), we show the corresponding objective value. The solutions are sorted based on their objective value. This plot gives information about the number of solutions that have a relatively similar objective value. Note that the number of solutions generated varies from instance to instance. 
+
+### Solution info
+This file simply gives some information about the instance and the solutions. Most importantly, it gives information about the difference between the solutions in the set of near-optimal solutions (i.e. all the solutions that are in the left-most plateu of the objective landscape plot). The difference in the solutions is defined as the maximum Hamming distance between any two solutions in the near-optimal set. The Hamming distance is taken between the solution vectors. 
+
+## References
+
+[1] Cazzaro, Davide; Pisinger, David (2021). Synthetic Instances for Large Offshore Wind Farm Layout. Technical University of Denmark. Dataset. https://doi.org/10.11583/DTU.13134731

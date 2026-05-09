@@ -1,0 +1,3 @@
+Number of nodes: 10
+Number of solution of close-to-optimal set: 8. 
+Diameter of close-to-optimal set using Hamming distance: 6
