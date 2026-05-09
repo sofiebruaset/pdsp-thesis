@@ -114,23 +114,16 @@ function pdsp_u2_with_history(
         newDelta = copy(Delta)
 
         for i in 1:n
-            for j in 1:n
-                if i != j
-                    pair_sum = D[i, j] + D[j, i]
+            for j in (i+1):n
+                pair_sum = D[i, j] + D[j, i]
 
-                    # y[i,j] means y_i^j.
-                    # D[i,j] contributes when i is selected in j's local problem
-                    # and j is selected globally.
-                    contribution_ij = (y[i, j] && x[j]) ? 1.0 : 0.0
+                contribution_ij = (y[i, j] && x[j]) ? 1.0 : 0.0
+                contribution_ji = (y[j, i] && x[i]) ? 1.0 : 0.0
 
-                    # D[j,i] contributes when j is selected in i's local problem
-                    # and i is selected globally.
-                    contribution_ji = (y[j, i] && x[i]) ? 1.0 : 0.0
+                step = (contribution_ij - contribution_ji) * pair_sum / (2.0 * k)
 
-                    newDelta[i, j] =
-                        Delta[i, j] +
-                        (contribution_ji - contribution_ij) * pair_sum / (2.0 * k) #This is correct do not change it
-                end
+                newDelta[i, j] = Delta[i, j] + step
+                newDelta[j, i] = -newDelta[i, j]
             end
         end
 

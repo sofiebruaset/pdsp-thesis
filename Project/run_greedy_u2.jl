@@ -13,7 +13,6 @@ const MATRIX_ROOT = joinpath(PROJECT_ROOT, "30883835")
 const DIST_ROOT = joinpath(PROJECT_ROOT, "30883835", "dist_to_substation")
 
 const U2_VERBOSE = false
-const MAX_U2_ITERATIONS = 200
 
 struct CableType
     cost::Float64
@@ -47,6 +46,25 @@ function get_available_zones(info)
     end
 
     return sort(zones)
+end
+
+function make_shifted_bound_matrix(Π::Matrix{Float64})
+    n = size(Π, 1)
+
+    offdiag_min = minimum(Π[i, j] for i in 1:n, j in 1:n if i != j)
+    shift = max(0.0, -offdiag_min)
+
+    Π_bound = copy(Π)
+
+    for i in 1:n
+        for j in 1:n
+            if i != j
+                Π_bound[i, j] = Π[i, j] + shift
+            end
+        end
+    end
+
+    return Π_bound, shift
 end
 
 function save_solution(
@@ -127,21 +145,34 @@ function main()
 
             Π = copy(zone_data.power_submatrix)
 
+            println("size Π = ", size(Π))
+            println("min Π = ", minimum(Π), ", max Π = ", maximum(Π))
+            println("symmetric? ", Π ≈ Π')
+
             chosen_local = greedy_remove_worst(Π, zone_data.q)
             z = objective_value(Π, chosen_local)
 
-            U1 = pdsp_u1(Π, zone_data.q)
+            Π_bound, shift = make_shifted_bound_matrix(Π)
+            correction = shift * zone_data.q * (zone_data.q - 1)
 
-            # For large zones, a full U2 search over all candidates is often impractical.
-            full_iterations = size(Π, 1)
+            println("Off-diagonal shift used for bounds: ", shift)
+            println("Correction subtracted from shifted bounds: ", correction)
+
+            U1_bound = pdsp_u1(Π_bound, zone_data.q)
+
+            full_iterations = size(Π_bound, 1)
             iterations = full_iterations
 
-            U2, U2_history, U2_best_iter = pdsp_u2_with_history(
-                Π,
+            U2_bound, U2_history_bound, U2_best_iter = pdsp_u2_with_history(
+                Π_bound,
                 zone_data.q;
                 iterations = iterations,
                 verbose = U2_VERBOSE
             )
+
+            U1 = U1_bound - correction
+            U2 = U2_bound - correction
+            U2_history = U2_history_bound .- correction
 
             cable_U = cable_upper_bound(zone_data.distances, chosen_local, CABLES)
             L1 = lower_bound_l1(zone_data.distances, chosen_local, CABLES)
@@ -151,7 +182,6 @@ function main()
             println("PDSP upper bound U1: ", U1)
             println("PDSP upper bound U2: ", U2)
             println("U2 iterations used: ", iterations, " of ", full_iterations)
-            println("U2 iterations used: ", iterations)
             println("U2 best iteration: ", U2_best_iter)
             println("Cable upper bound: ", cable_U)
             println("Initial lower bound L1: ", L1)
@@ -165,7 +195,7 @@ function main()
             println("First 10 U2 values: ", U2_history[1:min(10, length(U2_history))])
 
             if U2 > U1 + 1e-8
-                println("WARNING: U2 is larger than U1. This should not happen because iteration 1 equals U1.")
+                println("WARNING: U2 is larger than U1. This should not happen.")
             end
 
             save_solution(
