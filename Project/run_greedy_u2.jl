@@ -134,7 +134,7 @@ function main()
 
             # For large zones, a full U2 search over all candidates is often impractical.
             full_iterations = size(Π, 1)
-            iterations = min(full_iterations, MAX_U2_ITERATIONS)
+            iterations = full_iterations
 
             U2, U2_history, U2_best_iter = pdsp_u2_with_history(
                 Π,
@@ -150,9 +150,7 @@ function main()
             println("Objective value: ", z)
             println("PDSP upper bound U1: ", U1)
             println("PDSP upper bound U2: ", U2)
-            if iterations < full_iterations
-                println("U2 iterations capped to ", iterations, " of ", full_iterations, " candidates to keep runtime manageable.")
-            end
+            println("U2 iterations used: ", iterations, " of ", full_iterations)
             println("U2 iterations used: ", iterations)
             println("U2 best iteration: ", U2_best_iter)
             println("Cable upper bound: ", cable_U)
