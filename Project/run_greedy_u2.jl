@@ -138,7 +138,7 @@ function main()
             U1 = pdsp_u1(Π, zone_data.q)
 
             full_iterations = size(Π, 1)
-            iterations = full_iterations
+            iterations = min(full_iterations, 200)
 
             U2, U2_history, U2_best_iter = pdsp_u2_with_history(
                 Π,
