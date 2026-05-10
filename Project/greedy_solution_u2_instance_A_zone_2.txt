@@ -4,15 +4,15 @@ Target q: 7
 Selected turbines: 7
 Objective value: 64.07005589110001
 PDSP upper bound U1: 65.30775595665001
-PDSP upper bound U2: 65.30775595665001
-U2 iterations used: 1009
-U2 best iteration: 1
+PDSP upper bound U2: 65.2696543664356
+U2 iterations used: 200
+U2 best iteration: 200
 Cable upper bound: 9.11335908472e6
 Initial lower bound L1: 3.7525596231200006e6
 
 Gap U1 - z: 1.2377000655500012
-Gap U2 - z: 1.2377000655500012
-Improvement U1 - U2: 0.0
+Gap U2 - z: 1.1995984753355913
+Improvement U1 - U2: 0.03810159021440995
 
 Local indices within zone:
 24
