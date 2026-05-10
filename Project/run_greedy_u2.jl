@@ -48,24 +48,7 @@ function get_available_zones(info)
     return sort(zones)
 end
 
-function make_shifted_bound_matrix(Π::Matrix{Float64})
-    n = size(Π, 1)
 
-    offdiag_min = minimum(Π[i, j] for i in 1:n, j in 1:n if i != j)
-    shift = max(0.0, -offdiag_min)
-
-    Π_bound = copy(Π)
-
-    for i in 1:n
-        for j in 1:n
-            if i != j
-                Π_bound[i, j] = Π[i, j] + shift
-            end
-        end
-    end
-
-    return Π_bound, shift
-end
 
 function save_solution(
     zone_data::ZoneData,
@@ -152,27 +135,17 @@ function main()
             chosen_local = greedy_remove_worst(Π, zone_data.q)
             z = objective_value(Π, chosen_local)
 
-            Π_bound, shift = make_shifted_bound_matrix(Π)
-            correction = shift * zone_data.q * (zone_data.q - 1)
+            U1 = pdsp_u1(Π, zone_data.q)
 
-            println("Off-diagonal shift used for bounds: ", shift)
-            println("Correction subtracted from shifted bounds: ", correction)
-
-            U1_bound = pdsp_u1(Π_bound, zone_data.q)
-
-            full_iterations = size(Π_bound, 1)
+            full_iterations = size(Π, 1)
             iterations = full_iterations
 
-            U2_bound, U2_history_bound, U2_best_iter = pdsp_u2_with_history(
-                Π_bound,
+            U2, U2_history, U2_best_iter = pdsp_u2_with_history(
+                Π,
                 zone_data.q;
                 iterations = iterations,
                 verbose = U2_VERBOSE
             )
-
-            U1 = U1_bound - correction
-            U2 = U2_bound - correction
-            U2_history = U2_history_bound .- correction
 
             cable_U = cable_upper_bound(zone_data.distances, chosen_local, CABLES)
             L1 = lower_bound_l1(zone_data.distances, chosen_local, CABLES)

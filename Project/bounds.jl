@@ -120,7 +120,8 @@ function pdsp_u2_with_history(
                 contribution_ij = (y[i, j] && x[j]) ? 1.0 : 0.0
                 contribution_ji = (y[j, i] && x[i]) ? 1.0 : 0.0
 
-                step = (contribution_ij - contribution_ji) * pair_sum / (2.0 * k)
+                step_size = abs(pair_sum) / (2.0 * k)
+                step = (contribution_ji - contribution_ij) * step_size
 
                 newDelta[i, j] = Delta[i, j] + step
                 newDelta[j, i] = -newDelta[i, j]
@@ -128,6 +129,20 @@ function pdsp_u2_with_history(
         end
 
         Delta = newDelta
+
+        if k <= 5
+            R = D .+ Delta
+
+            max_pair_error = maximum(abs.(
+                (R[i,j] + R[j,i]) - (D[i,j] + D[j,i])
+                for i in 1:n, j in 1:n if i != j
+            ))
+
+            println("iter ", k)
+            println("U = ", U)
+            println("max pair preservation error = ", max_pair_error)
+            println("max abs Delta = ", maximum(abs.(Delta)))
+        end
 
         if verbose
             println("U2 iteration ", k, ": ", U)
