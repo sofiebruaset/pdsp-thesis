@@ -100,7 +100,7 @@ function save_solution(
 end
 
 function main()
-    instances = [ "G", "H", "I", "J"]
+    instances = [ "H", "I", "J"]
     # instances = ["A"]
 
     for instance in instances
